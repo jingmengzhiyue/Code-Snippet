@@ -1,0 +1,91 @@
+{
+  "folders": [
+    {
+      "id": "a3J2dD70",
+      "name": "SQL",
+      "defaultLanguage": "typescript",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "createdAt": 1721914781261,
+      "updatedAt": 1721915029288,
+      "index": 0
+    },
+    {
+      "name": "C/C++",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "plain_text",
+      "id": "Yw8pt8qI",
+      "createdAt": 1721915030887,
+      "updatedAt": 1721915040510,
+      "index": 1
+    },
+    {
+      "name": "Python",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "plain_text",
+      "id": "cJDhE0wQ",
+      "createdAt": 1721915043541,
+      "updatedAt": 1721915051569,
+      "index": 2
+    },
+    {
+      "name": "HTML",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "plain_text",
+      "id": "H4Pcaroy",
+      "createdAt": 1721915054654,
+      "updatedAt": 1721915059283,
+      "index": 3
+    },
+    {
+      "name": "CSS",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "plain_text",
+      "id": "deX-NgHx",
+      "createdAt": 1721915061449,
+      "updatedAt": 1721915065487,
+      "index": 4
+    },
+    {
+      "name": "Vue",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "plain_text",
+      "id": "ISb5bYG8",
+      "createdAt": 1721915067426,
+      "updatedAt": 1721915071996,
+      "index": 5
+    }
+  ],
+  "snippets": [
+    {
+      "isDeleted": false,
+      "isFavorites": true,
+      "folderId": "a3J2dD70",
+      "tagsIds": [],
+      "description": null,
+      "name": "Oracle创建一个只能查询的新账户",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "plain_text",
+          "value": "-- 创建一个新用户，指定用户名，密码\nCREATE USER new_user IDENTIFIED BY your_password; \n-- 授予用户连接选项，不然用户无法连接数据库\nGRANT CONNECT TO new_user; \n-- 授予用户对某张表的查询权限\nGRANT SELECT ON schema_owner.ERP_SHEDULE_SHEET TO new_user; \nGRANT SELECT ON schema_owner.TRACK_MATERIAL TO new_user;"
+        }
+      ],
+      "id": "lFXOrMMK",
+      "createdAt": 1721914969710,
+      "updatedAt": 1721915083938
+    }
+  ],
+  "tags": []
+}
