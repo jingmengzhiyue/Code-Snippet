@@ -78,14 +78,61 @@
       "content": [
         {
           "label": "子片段 1",
-          "language": "plain_text",
+          "language": "sql",
           "value": "-- 创建一个新用户，指定用户名，密码\nCREATE USER new_user IDENTIFIED BY your_password; \n-- 授予用户连接选项，不然用户无法连接数据库\nGRANT CONNECT TO new_user; \n-- 授予用户对某张表的查询权限\nGRANT SELECT ON schema_owner.ERP_SHEDULE_SHEET TO new_user; \nGRANT SELECT ON schema_owner.TRACK_MATERIAL TO new_user;"
         }
       ],
       "id": "lFXOrMMK",
       "createdAt": 1721914969710,
-      "updatedAt": 1721915083938
+      "updatedAt": 1721957807137
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "qiJo0wF7"
+      ],
+      "description": null,
+      "name": "数据库操作",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "FormatString\ts;  // 定义格式化字符串方法\nconst char*\t\tsql; //定义一个数据库查询\n_CommandPtr\t\tcmd; // 数据库查询命令\n_RecordsetPtr\trs; // 数据库查询结果指针\n\nDatabase\tdba1(\"dba.udl\"); // 使用udl文件定义数据库连接\n\nsql = s(\"select SLAB_ID from TRACK_MATERIAL where ZONE_CODE = 4000 and XPOS = (select min(XPOS) from TRACK_MATERIAL where ZONE_CODE = 4000)\"); //  数据库查询命令书写\ncmd = dba.CreateCommand(); // 创建一个次年度数据库查询对象\ncmd->CommandText = (_bstr_t)sql; // 给对象中的查询语句赋值\nrs = cmd->Execute(NULL, 0, adCmdText); // 执行查询,获取查询结果的指针\n\n\nwhile (!rs->adoEOF)  // 在指针没有到结尾时，逐行处理数据\n\t{\n    /*\n    数据库操作代码，包括根据数据库读取结果进行变脸赋值，更新数据库中某一条目，\n    */\n\n\t\trs->MoveNext(); // 指针指向下一条数据\n\n\t}\n\tdba1.Disconnect(); // 断开数据库连接"
+        }
+      ],
+      "id": "xJqmmXuE",
+      "createdAt": 1721957199101,
+      "updatedAt": 1721957880271
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "qiJo0wF7"
+      ],
+      "description": null,
+      "name": "创建事务",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "dba.BeginTrans(\"dba.udl\"); // 连接数据库创建事务\nsql = s(\"insert into TB_PRODUCT_HIS select * from TB_PRODUCT where DISCHARGE_TIME<sysdate-90\");  // 事务语句\ncmd = dba.CreateCommand(); \ncmd->CommandText = (_bstr_t)sql;\ncmd->Execute(NULL, 0, adCmdText); // 执行查询\ndba.CommitTrans(\"dba.udl\"); 、// 事务提交\n// dba.RollbackTrans; 事务回滚"
+        }
+      ],
+      "id": "Tue5u7oh",
+      "createdAt": 1721959080848,
+      "updatedAt": 1721959299817
     }
   ],
-  "tags": []
+  "tags": [
+    {
+      "name": "PCDP",
+      "id": "qiJo0wF7",
+      "createdAt": 1721957224538,
+      "updatedAt": 1721957224538
+    }
+  ]
 }
