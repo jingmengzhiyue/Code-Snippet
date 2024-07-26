@@ -3,12 +3,12 @@
     {
       "id": "a3J2dD70",
       "name": "SQL",
-      "defaultLanguage": "typescript",
+      "defaultLanguage": "sql",
       "parentId": null,
       "isOpen": false,
       "isSystem": false,
       "createdAt": 1721914781261,
-      "updatedAt": 1721915029288,
+      "updatedAt": 1721971028536,
       "index": 0
     },
     {
@@ -16,10 +16,10 @@
       "parentId": null,
       "isOpen": false,
       "isSystem": false,
-      "defaultLanguage": "plain_text",
+      "defaultLanguage": "c_cpp",
       "id": "Yw8pt8qI",
       "createdAt": 1721915030887,
-      "updatedAt": 1721915040510,
+      "updatedAt": 1721971034631,
       "index": 1
     },
     {
@@ -27,10 +27,10 @@
       "parentId": null,
       "isOpen": false,
       "isSystem": false,
-      "defaultLanguage": "plain_text",
+      "defaultLanguage": "python",
       "id": "cJDhE0wQ",
       "createdAt": 1721915043541,
-      "updatedAt": 1721915051569,
+      "updatedAt": 1721971046478,
       "index": 2
     },
     {
@@ -38,10 +38,10 @@
       "parentId": null,
       "isOpen": false,
       "isSystem": false,
-      "defaultLanguage": "plain_text",
+      "defaultLanguage": "html",
       "id": "H4Pcaroy",
       "createdAt": 1721915054654,
-      "updatedAt": 1721915059283,
+      "updatedAt": 1721971056862,
       "index": 3
     },
     {
@@ -49,10 +49,10 @@
       "parentId": null,
       "isOpen": false,
       "isSystem": false,
-      "defaultLanguage": "plain_text",
+      "defaultLanguage": "css",
       "id": "deX-NgHx",
       "createdAt": 1721915061449,
-      "updatedAt": 1721915065487,
+      "updatedAt": 1721971063902,
       "index": 4
     },
     {
@@ -60,11 +60,41 @@
       "parentId": null,
       "isOpen": false,
       "isSystem": false,
-      "defaultLanguage": "plain_text",
+      "defaultLanguage": "vue",
       "id": "ISb5bYG8",
       "createdAt": 1721915067426,
-      "updatedAt": 1721915071996,
+      "updatedAt": 1721971079012,
       "index": 5
+    },
+    {
+      "name": "JavaScript",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "javascript",
+      "id": "0UbdBBJN",
+      "createdAt": 1721971080945,
+      "updatedAt": 1721971097751
+    },
+    {
+      "name": "C#",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "csharp",
+      "id": "DscWMix7",
+      "createdAt": 1721971101423,
+      "updatedAt": 1721971116436
+    },
+    {
+      "name": "Java",
+      "parentId": null,
+      "isOpen": false,
+      "isSystem": false,
+      "defaultLanguage": "java",
+      "id": "1VrLx0IY",
+      "createdAt": 1721971147366,
+      "updatedAt": 1721971164420
     }
   ],
   "snippets": [
@@ -99,12 +129,12 @@
         {
           "label": "子片段 1",
           "language": "c_cpp",
-          "value": "FormatString\ts;  // 定义格式化字符串方法\nconst char*\t\tsql; //定义一个数据库查询\n_CommandPtr\t\tcmd; // 数据库查询命令\n_RecordsetPtr\trs; // 数据库查询结果指针\n\nDatabase\tdba1(\"dba.udl\"); // 使用udl文件定义数据库连接\n\nsql = s(\"select SLAB_ID from TRACK_MATERIAL where ZONE_CODE = 4000 and XPOS = (select min(XPOS) from TRACK_MATERIAL where ZONE_CODE = 4000)\"); //  数据库查询命令书写\ncmd = dba.CreateCommand(); // 创建一个次年度数据库查询对象\ncmd->CommandText = (_bstr_t)sql; // 给对象中的查询语句赋值\nrs = cmd->Execute(NULL, 0, adCmdText); // 执行查询,获取查询结果的指针\n\n\nwhile (!rs->adoEOF)  // 在指针没有到结尾时，逐行处理数据\n\t{\n    /*\n    数据库操作代码，包括根据数据库读取结果进行变脸赋值，更新数据库中某一条目，\n    */\n\n\t\trs->MoveNext(); // 指针指向下一条数据\n\n\t}\n\tdba1.Disconnect(); // 断开数据库连接"
+          "value": "FormatString\ts;  // 定义格式化字符串方法\nconst char*\t\tsql; //定义一个数据库查询\n_CommandPtr\t\tcmd; // 数据库查询命令\n_RecordsetPtr\trs; // 数据库查询结果指针\n\nDatabase\tdba1(\"dba.udl\"); // 使用udl文件定义数据库连接\nif (dba.IsConnected() == false) // 鲁棒性判断，防止数据库没有连接成功\n\t{\n\t\tALARM(AL_WARNING, 1003, true, \"数据库连接已断开,重新连接。。。\");\n\t\tdba.Connect(\"dba.udl\");\n\t}\n\nsql = s(\"select SLAB_ID from TRACK_MATERIAL where ZONE_CODE = 4000 and XPOS = (select min(XPOS) from TRACK_MATERIAL where ZONE_CODE = 4000)\"); //  数据库查询命令书写\ncmd = dba.CreateCommand(); // 创建一个次年度数据库查询对象\ncmd->CommandText = (_bstr_t)sql; // 给对象中的查询语句赋值\nrs = cmd->Execute(NULL, 0, adCmdText); // 执行查询,获取查询结果的指针\n\n\nwhile (!rs->adoEOF)  // 在指针没有到结尾时，逐行处理数据\n\t{\n    /*\n    数据库操作代码，包括根据数据库读取结果进行变脸赋值，更新数据库中某一条目，\n    */\n\n\t\trs->MoveNext(); // 指针指向下一条数据\n\n\t}\n\tdba1.Disconnect(); // 断开数据库连接"
         }
       ],
       "id": "xJqmmXuE",
       "createdAt": 1721957199101,
-      "updatedAt": 1721957880271
+      "updatedAt": 1721963307381
     },
     {
       "isDeleted": false,
