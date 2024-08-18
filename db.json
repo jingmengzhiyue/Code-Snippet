@@ -121,7 +121,8 @@
       "isFavorites": false,
       "folderId": "Yw8pt8qI",
       "tagsIds": [
-        "qiJo0wF7"
+        "qiJo0wF7",
+        "wiCDG8SZ"
       ],
       "description": null,
       "name": "数据库操作",
@@ -134,14 +135,15 @@
       ],
       "id": "xJqmmXuE",
       "createdAt": 1721957199101,
-      "updatedAt": 1721963307381
+      "updatedAt": 1723959563585
     },
     {
       "isDeleted": false,
       "isFavorites": false,
       "folderId": "Yw8pt8qI",
       "tagsIds": [
-        "qiJo0wF7"
+        "qiJo0wF7",
+        "V6iF2I4j"
       ],
       "description": null,
       "name": "创建事务",
@@ -154,7 +156,89 @@
       ],
       "id": "Tue5u7oh",
       "createdAt": 1721959080848,
-      "updatedAt": 1721959299817
+      "updatedAt": 1723959574026
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "olQfjjLQ",
+        "VqKC7a91",
+        "877M1sfA"
+      ],
+      "description": "对实时数据进行平滑，利用历史数据中的中位数代替实时数据，减缓数据的波动",
+      "name": "中位数平滑算法",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "//! 创建一个临时vector，将原始的数据导入进来\nstd::vector<float> sortedBuffer = dataBuffer; \n//! deque 向vector赋值需要使用如下方式\nstd::vector<float> sortedBuffer(dataBuffer.begin(), dataBuffer.end());\n/**\n * @brief 部分排序一个序列\n *\n * 使得第n个元素（称为枢轴）放置在正确的位置上，使得所有在它左边的元素都不大于它，\n * 所有在它右边的元素都不小于它。这个操作并不保证除了这个枢轴位置以外的其他元素是排序好的。\n *\n * @param sortedBuffer.begin() 指定了要操作的序列的开始位置\n * @param sortedBuffer.begin()+sortedBuffer.size()/2 指定了你想要正确放置的元素的位置，也就是中位数的位置。\n * 由于sortedBuffer.size()/2取的是整数除法的结果，所以当容器大小是偶数时，这个位置实际上是指向了两个中间值中的后一个。\n * @param sortedBuffer.end() 指定了要操作的序列的结束位置\n */\nstd::nth_element(sortedBuffer.begin(), sortedBuffer.begin() + sortedBuffer.size()/2, sortedBuffer.end()); \n//! 获取中位数值\nfloat medianValue = sortedBuffer[sortedBuffer.size()/2];"
+        }
+      ],
+      "id": "Kdku6H2O",
+      "createdAt": 1723959504976,
+      "updatedAt": 1723962164207
+    },
+    {
+      "isDeleted": true,
+      "isFavorites": false,
+      "folderId": "",
+      "tagsIds": [],
+      "description": null,
+      "name": "",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "plain_text",
+          "value": ""
+        }
+      ],
+      "id": "UpTPvDmW",
+      "createdAt": 1723962167307,
+      "updatedAt": 1723962177756
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "olQfjjLQ",
+        "-5hHasNq",
+        "6DGis_cO"
+      ],
+      "description": null,
+      "name": "分位数平滑算法",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <vector>\n#include <algorithm>\nstd::vector<float> data = { /* 初始化你的数据 */ };\n\n//! 首先对向量进行排序，默认进行升序排列\nstd::sort(data.begin(), data.end());\n\n//! 降序排序算法\n// std::sort(data.begin(), data.end(), [](float a, float b) { return a > b; }); // 降序排序\n//! 计算截取的起始和结束位置\nsize_t start = data.size() * 0.30;\nsize_t end = data.size() * 0.60;\n\n// 确保start和end在有效范围内\nif (start > data.size()) start = data.size();\nif (end > data.size()) end = data.size();\n\n// 截取30%到60%的数据\nstd::vector<float> sliced_data(data.begin() + start, data.begin() + end);\n"
+        }
+      ],
+      "id": "78TbSqQt",
+      "createdAt": 1723962180806,
+      "updatedAt": 1723962561165
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "oymDhoMO"
+      ],
+      "description": null,
+      "name": "计算平均值",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "//! 创建向量数据\nstd::vector<float> sliced_data = { /* 初始化你的数据，例如：1.0f, 2.0f, 3.0f, 4.0f, 5.0f */ };\n\n//! 累加器清空\nfloat sum = 0.0f;\n\n//! 使用auto快速遍历累加\nfor (const auto& value : sliced_data) {\n\tsum += value;\n}\n//! 求和除以元素个数\nfloat average = sum / sliced_data.size();"
+        }
+      ],
+      "id": "09jg2uO8",
+      "createdAt": 1723962591080,
+      "updatedAt": 1723962699118
     }
   ],
   "tags": [
@@ -163,6 +247,60 @@
       "id": "qiJo0wF7",
       "createdAt": 1721957224538,
       "updatedAt": 1721957224538
+    },
+    {
+      "name": "数据库",
+      "id": "tympKbpW",
+      "createdAt": 1723959545872,
+      "updatedAt": 1723959545872
+    },
+    {
+      "name": "数据库查询",
+      "id": "wiCDG8SZ",
+      "createdAt": 1723959563524,
+      "updatedAt": 1723959563524
+    },
+    {
+      "name": "数据库事务",
+      "id": "V6iF2I4j",
+      "createdAt": 1723959573962,
+      "updatedAt": 1723959573962
+    },
+    {
+      "name": "平滑算法",
+      "id": "olQfjjLQ",
+      "createdAt": 1723959591206,
+      "updatedAt": 1723959591206
+    },
+    {
+      "name": "中位数平滑",
+      "id": "VqKC7a91",
+      "createdAt": 1723961926870,
+      "updatedAt": 1723961926870
+    },
+    {
+      "name": "部分排序",
+      "id": "877M1sfA",
+      "createdAt": 1723961933250,
+      "updatedAt": 1723961933250
+    },
+    {
+      "name": "完全排序",
+      "id": "-5hHasNq",
+      "createdAt": 1723962202384,
+      "updatedAt": 1723962202384
+    },
+    {
+      "name": "分位数",
+      "id": "6DGis_cO",
+      "createdAt": 1723962208125,
+      "updatedAt": 1723962208125
+    },
+    {
+      "name": "平均值计算",
+      "id": "oymDhoMO",
+      "createdAt": 1723962667492,
+      "updatedAt": 1723962667492
     }
   ]
 }
