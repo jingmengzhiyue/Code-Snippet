@@ -233,12 +233,33 @@
         {
           "label": "子片段 1",
           "language": "c_cpp",
-          "value": "//! 创建向量数据\nstd::vector<float> sliced_data = { /* 初始化你的数据，例如：1.0f, 2.0f, 3.0f, 4.0f, 5.0f */ };\n\n//! 累加器清空\nfloat sum = 0.0f;\n\n//! 使用auto快速遍历累加\nfor (const auto& value : sliced_data) {\n\tsum += value;\n}\n//! 求和除以元素个数\nfloat average = sum / sliced_data.size();"
+          "value": "//! 创建向量数据\nstd::vector<float> sliced_data = { /* 初始化你的数据，例如：1.0f, 2.0f, 3.0f, 4.0f, 5.0f */ };\n\n//! 累加器清空\nfloat sum = 0.0f;\n\n//! 使用auto快速遍历累加\nfor (const auto& value : sliced_data) {\n\tsum += value;\n}\n//! 除以元素个数\nfloat average = sum / sliced_data.size();"
         }
       ],
       "id": "09jg2uO8",
       "createdAt": 1723962591080,
-      "updatedAt": 1723962699118
+      "updatedAt": 1723965020795
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "dZIEd2vu",
+        "6_2rdfLQ"
+      ],
+      "description": null,
+      "name": "读取INI文件",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <iostream>\n#include <fstream>\n#include <sstream>\n#include <string>\n#include <unordered_map>\n#include <map>\n\n/**\n * @brief A class to read and parse INI configuration files.\n */\nclass INIReader\n{\npublic:\n    /**\n     * @brief Loads and parses an INI file.\n     *\n     * This function reads the INI file line by line, identifies sections and key-value pairs,\n     * and stores them in an internal data structure for later retrieval.\n     *\n     * @param filename The path to the INI file to load.\n     * @return true if the file was successfully loaded and parsed, false otherwise.\n     */\n    bool Load(const std::string &filename)\n    {\n        std::ifstream file(filename);\n        if (!file.is_open())\n        {\n            std::cerr << \"Could not open file: \" << filename << std::endl;\n            return false;\n        }\n\n        std::string line;\n        std::string currentSection;\n        while (std::getline(file, line))\n        {\n            line = Trim(line);\n\n            // Skip empty lines and comments\n            if (line.empty() || line[0] == ';' || line[0] == '#')\n            {\n                continue;\n            }\n\n            // Identify section headers\n            if (line.front() == '[' && line.back() == ']')\n            {\n                currentSection = line.substr(1, line.size() - 2);\n            }\n            else\n            {\n                // Identify key-value pairs\n                auto delimiterPos = line.find('=');\n                if (delimiterPos != std::string::npos)\n                {\n                    std::string key = Trim(line.substr(0, delimiterPos));\n                    std::string value = Trim(line.substr(delimiterPos + 1));\n                    data[currentSection][key] = value;\n                }\n            }\n        }\n\n        file.close();\n        return true;\n    }\n\n    /**\n     * @brief Retrieves a value from the INI file based on section and key.\n     *\n     * If the section or key does not exist, this function will return a default value.\n     *\n     * @param section The section name where the key is located.\n     * @param key The key whose value is to be retrieved.\n     * @param defaultValue The default value to return if the key is not found (optional).\n     * @return The value corresponding to the key, or the default value if the key is not found.\n     */\n    std::string Get(const std::string &section, const std::string &key, const std::string &defaultValue = \"\") const\n    {\n        auto sectionIt = data.find(section);\n        if (sectionIt != data.end())\n        {\n            auto keyIt = sectionIt->second.find(key);\n            if (keyIt != sectionIt->second.end())\n            {\n                return keyIt->second;\n            }\n        }\n        return defaultValue;\n    }\n\n    /**\n     * @brief Sets a value in the INI configuration.\n     * @param section The section name where the key is located.\n     * @param key The key whose value is to be set.\n     * @param value The value to set for the specified key.\n     */\n    void Set(const std::string &section, const std::string &key, const std::string &value)\n    {\n        data[section][key] = value;\n    }\n\n    /**\n     * @brief Writes the current configuration to an INI file.\n     * @param filename The path to the INI file to write.\n     * @return true if the file was successfully written, false otherwise.\n     */\n    bool Save(const std::string &filename) const\n    {\n        std::ofstream file(filename);\n        if (!file.is_open())\n        {\n            std::cerr << \"Could not open file: \" << filename << std::endl;\n            return false;\n        }\n\n        for (const auto &sectionPair : data)\n        {\n            file << \"[\" << sectionPair.first << \"]\\n\";\n            for (const auto &kv : sectionPair.second)\n            {\n                file << kv.first << \" = \" << kv.second << \"\\n\";\n            }\n            file << \"\\n\";\n        }\n\n        file.close();\n        return true;\n    }\n\nprivate:\n    /**\n     * @brief A map to store sections and their corresponding key-value pairs.\n     *\n     * The outer map's key is the section name, and the inner map stores key-value pairs within that section.\n     */\n    std::unordered_map<std::string, std::map<std::string, std::string>> data;\n\n    /**\n     * @brief Trims whitespace from both ends of a string.\n     *\n     * This utility function removes leading and trailing whitespace characters\n     * (spaces and tabs) from the given string.\n     *\n     * @param str The string to trim.\n     * @return A new string with leading and trailing whitespace removed.\n     */\n    static std::string Trim(const std::string &str)\n    {\n        const std::string whitespace = \" \\t\";\n        const auto strBegin = str.find_first_not_of(whitespace);\n        if (strBegin == std::string::npos)\n        {\n            return \"\"; // No content\n        }\n\n        const auto strEnd = str.find_last_not_of(whitespace);\n        const auto strRange = strEnd - strBegin + 1;\n\n        return str.substr(strBegin, strRange);\n    }\n};\n\n/**\n * @brief Entry point for the INI reader program.\n *\n * This main function demonstrates how to load an INI file and retrieve values\n * from it using the INIReader class.\n *\n * @return int Returns 0 on successful execution.\n */\n\nint main()\n{\n    INIReader reader;\n\n    // 加载配置文件\n    if (reader.Load(\"config.ini\"))\n    {\n        std::string host = reader.Get(\"network\", \"host\", \"localhost\");\n        std::string port = reader.Get(\"network\", \"port\", \"8080\");\n\n        std::cout << \"Host: \" << host << std::endl;\n        std::cout << \"Port: \" << port << std::endl;\n\n        // 修改配置并保存\n        reader.Set(\"network\", \"host\", \"10.0.0.1\");\n        reader.Set(\"network\", \"port\", \"9090\");\n        reader.Save(\"config_modified.ini\");\n\n        std::cout << \"Updated configuration saved to config_modified.ini\" << std::endl;\n    }\n\n    return 0;\n}"
+        }
+      ],
+      "id": "HEiOTpNN",
+      "createdAt": 1723991600741,
+      "updatedAt": 1723992684700
     }
   ],
   "tags": [
@@ -301,6 +322,18 @@
       "id": "oymDhoMO",
       "createdAt": 1723962667492,
       "updatedAt": 1723962667492
+    },
+    {
+      "name": "读取ini",
+      "id": "dZIEd2vu",
+      "createdAt": 1723991619240,
+      "updatedAt": 1723991619240
+    },
+    {
+      "name": "写入ini",
+      "id": "6_2rdfLQ",
+      "createdAt": 1723992684621,
+      "updatedAt": 1723992684621
     }
   ]
 }
