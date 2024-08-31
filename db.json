@@ -260,6 +260,27 @@
       "id": "HEiOTpNN",
       "createdAt": 1723991600741,
       "updatedAt": 1723992684700
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "tO8O6gJG",
+        "5vjFnMST"
+      ],
+      "description": null,
+      "name": "POST请求",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <iostream>\n#include <string>\n#include <vector>\n#include <map>\n#include <curl/curl.h>\n#include <json/json.h>\n\n/**\n * @brief 回调函数，用于接收 HTTP 响应\n * @param contents 接收到的数据内容\n * @param size 每个数据块的大小\n * @param nmemb 数据块的数量\n * @param s 用于存储接收到的数据的字符串指针\n * @return 实际处理的数据大小\n */\nstatic size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* s) {\n\tsize_t newLength = size * nmemb;\n\ttry {\n\t\ts->append((char*)contents, newLength);\n\t}\n\tcatch (std::bad_alloc&) {\n\t\t// 内存分配失败时返回0\n\t\treturn 0;\n\t}\n\treturn newLength;\n}\n\n/**\n * @brief 发送 POST 请求并返回响应内容\n * @param url 请求的 URL\n * @param jsonData 请求的 JSON 数据\n * @return 服务器的响应内容\n */\nstd::string sendPostRequest(const std::string& url, const std::string& jsonData) {\n\tCURL* curl;\n\tCURLcode res;\n\tstd::string readBuffer;\n\n\tcurl_global_init(CURL_GLOBAL_DEFAULT);\n\tcurl = curl_easy_init();\n\tif (curl) {\n\t\tstruct curl_slist* headers = nullptr;\n\t\theaders = curl_slist_append(headers, \"Content-Type: application/json\");\n\n\t\tcurl_easy_setopt(curl, CURLOPT_URL, url.c_str());\n\t\tcurl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());\n\t\tcurl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);\n\t\tcurl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);\n\t\tcurl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);\n\n\t\tres = curl_easy_perform(curl);\n\t\tif (res != CURLE_OK) {\n\t\t\tstd::cerr << \"curl_easy_perform() failed: \" << curl_easy_strerror(res) << std::endl;\n      // 添加以下4行代码可以在出错时立刻返回空串\n      curl_easy_cleanup(curl);\n\t\t\tcurl_slist_free_all(headers);\n\t\t\tcurl_global_cleanup();\n\t\t\treturn \"\"; // 直接返回，退出函数\n\t\t}\n\n\t\tcurl_easy_cleanup(curl);\n\t\tcurl_slist_free_all(headers);\n\t}\n\tcurl_global_cleanup();\n\n\treturn readBuffer;\n}\n\n/**\n * @brief 解析 JSON 响应并提取特定内容\n * @param jsonResponse 需要解析的 JSON 字符串\n * @return 提取的 JSON 数据\n */\nJson::Value parseJsonResponse(const std::string& jsonResponse) {\n\tJson::CharReaderBuilder readerBuilder;\n\tJson::Value root;\n\tstd::string errs;\n\tstd::istringstream ss(jsonResponse);\n\n\tif (!Json::parseFromStream(readerBuilder, ss, &root, &errs)) {\n\t\tstd::cerr << \"Failed to parse JSON: \" << errs << std::endl;\n    return Json::nullValue;  // 解析失败时返回空值\n\t}\n\n\t// 提取特定路径下的数据\n\treturn root[\"__blocks__\"][\"result\"][\"rows\"];\n}\n\n/**\n * @brief 映射 JSON 记录到字段名并输出\n * @param rows 包含多条记录的 JSON 数组\n */\nvoid mapAndPrintRows(const Json::Value& rows) {\n\t// 定义字段名\n\tstd::vector<std::string> fieldNames = {\n\t\t\"FactoryPSC\", \"HeatNo\", \"JobNo\", \"JodCutPlanNo\", \"LJ1FLAG\",\n\t\t\"MatNum\", \"PlanNum\", \"RLNO\", \"SlowCoolingTime\",\n\t\t\"StartDateTime\", \"StartStayDateTime\", \"Status\",\n\t\t\"StayTime\", \"WasteNum\"\n\t};\n\n\t// 遍历每一条记录\n\tfor (const auto& row : rows) {\n\t\tstd::map<std::string, std::string> recordMap;\n\n\t\t// 将每个值映射到相应的字段名\n\t\tfor (size_t i = 0; i < row.size() && i < fieldNames.size(); ++i) {\n\t\t\trecordMap[fieldNames[i]] = row[i].asString();\n\t\t}\n\n\t\t// 输出记录\n\t\tstd::cout << \"Record:\" << std::endl;\n\t\tfor (const auto& field : fieldNames) {\n\t\t\tstd::cout << \"  \" << field << \": \" << recordMap[field] << std::endl;\n\t\t}\n\t\tstd::cout << std::endl;\n\t}\n}\n\n/**\n * @brief 主函数\n * @return 程序退出状态\n */\nint main() {\n\t// 设置 URL 和 POST 请求数据\n\tstd::string url = \"http://10.38.98.30:8080/iplat/service/S_BI_XA_0306\";\n\tstd::string jsonData = R\"({\n        \"subjectEname\": \"OperationStoreQuery\",\n        \"offset\": \"0\",\n        \"limit\": \"1000\",\n        \"dataFormat\": \"inInfo\",\n        \"paramType\": \"unify\",\n        \"queryParamUnify\": {\n            \"whole_backlog_code\": \"120\",\n            \"jod_work_center\": \"04\"\n        }\n    })\";\n\n\t// 发送 POST 请求\n\tstd::string response = sendPostRequest(url, jsonData);\n\n\t// 解析响应并提取所需内容\n\tJson::Value rows = parseJsonResponse(response);\n\n\t// 映射并输出结果\n\tmapAndPrintRows(rows);\n\n\treturn 0;\n}\n\n"
+        }
+      ],
+      "id": "cbhlrf2z",
+      "createdAt": 1724812389483,
+      "updatedAt": 1724851188172
     }
   ],
   "tags": [
@@ -334,6 +355,18 @@
       "id": "6_2rdfLQ",
       "createdAt": 1723992684621,
       "updatedAt": 1723992684621
+    },
+    {
+      "name": "web",
+      "id": "tO8O6gJG",
+      "createdAt": 1724812409449,
+      "updatedAt": 1724812409449
+    },
+    {
+      "name": "post",
+      "id": "5vjFnMST",
+      "createdAt": 1724812411792,
+      "updatedAt": 1724812411792
     }
   ]
 }
