@@ -109,12 +109,12 @@
         {
           "label": "子片段 1",
           "language": "sql",
-          "value": "-- 创建一个新用户，指定用户名，密码\nCREATE USER new_user IDENTIFIED BY your_password; \n-- 授予用户连接选项，不然用户无法连接数据库\nGRANT CONNECT TO new_user; \n-- 授予用户对某张表的查询权限\nGRANT SELECT ON schema_owner.ERP_SHEDULE_SHEET TO new_user; \nGRANT SELECT ON schema_owner.TRACK_MATERIAL TO new_user;"
+          "value": "-- 创建一个新用户，指定用户名，密码\nCREATE USER new_user IDENTIFIED BY your_password; \n-- 授予用户连接选项，不然用户无法连接数据库\nGRANT CONNECT TO new_user; \n-- 授予用户对某张表的查询权限\nGRANT SELECT ON schema_owner.ERP_SHEDULE_SHEET TO new_user; \nGRANT SELECT ON schema_owner.TRACK_MATERIAL TO new_user;\n-- 授予用户数据管理员权限\nGRANT DBA TO FCEL2;"
         }
       ],
       "id": "lFXOrMMK",
       "createdAt": 1721914969710,
-      "updatedAt": 1721957807137
+      "updatedAt": 1725717663714
     },
     {
       "isDeleted": false,
@@ -281,6 +281,46 @@
       "id": "cbhlrf2z",
       "createdAt": 1724812389483,
       "updatedAt": 1724851188172
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "rNP4l83Z"
+      ],
+      "description": null,
+      "name": "执行数据库过程",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "const char*\t\tsql;\n_CommandPtr\t\tcmd;\n-- 输入数据库中过程名称\nsql = s(\"CHECK_PDI\");\n-- 创建数据库命令\ncmd = dba1.CreateCommand();\n-- 将数据库语句赋给查询命令\ncmd->CommandText = (_bstr_t)sql;\n-- 设置数据库语句执行类型为过程\ncmd->CommandType = adCmdStoredProc;\n-- 执行数据库语句，设置为数据库过程\ncmd->Execute(NULL, 0, adCmdStoredProc);"
+        }
+      ],
+      "id": "ngZDQTEy",
+      "createdAt": 1725846698487,
+      "updatedAt": 1725846862101
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "1VrLx0IY",
+      "tagsIds": [
+        "1q3yNmto"
+      ],
+      "description": null,
+      "name": "java定时执行",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "java",
+          "value": "public List query(){\n        List<TB_PDI> tbPdis = tbPdiMapper.find();\n        // 频繁对页面中的计划重新排序会导致资源死锁，因此使用定时器进行刷新\n        if (lastSortTime == null || new Date().getTime() - lastSortTime.getTime() > 2 * 60 * 1000) {\n            tbPdiMapper.Sort();\n            lastSortTime = new Date();\n        }\n        return tbPdis;\n    }"
+        }
+      ],
+      "id": "YqJuSk_q",
+      "createdAt": 1726740705983,
+      "updatedAt": 1726740745111
     }
   ],
   "tags": [
@@ -367,6 +407,18 @@
       "id": "5vjFnMST",
       "createdAt": 1724812411792,
       "updatedAt": 1724812411792
+    },
+    {
+      "name": "数据库过程",
+      "id": "rNP4l83Z",
+      "createdAt": 1725846862048,
+      "updatedAt": 1725846862048
+    },
+    {
+      "name": "定时执行",
+      "id": "1q3yNmto",
+      "createdAt": 1726740745042,
+      "updatedAt": 1726740745042
     }
   ]
 }
