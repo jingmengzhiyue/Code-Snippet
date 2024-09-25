@@ -178,7 +178,7 @@
       ],
       "id": "Kdku6H2O",
       "createdAt": 1723959504976,
-      "updatedAt": 1723962164207
+      "updatedAt": 1727100589677
     },
     {
       "isDeleted": true,
@@ -280,7 +280,7 @@
       ],
       "id": "cbhlrf2z",
       "createdAt": 1724812389483,
-      "updatedAt": 1724851188172
+      "updatedAt": 1727100230036
     },
     {
       "isDeleted": false,
@@ -321,6 +321,28 @@
       "id": "YqJuSk_q",
       "createdAt": 1726740705983,
       "updatedAt": 1726740745111
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "bVFKybKW",
+        "0NHs4HLy",
+        "olQfjjLQ"
+      ],
+      "description": null,
+      "name": "指数移动平滑",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <iostream>\n\nclass EMAFilter {\npublic:\n    EMAFilter(float alpha) : alpha(alpha), filteredValue(0), initialized(false) {}\n\n    float filter(float newValue) {\n        if (!initialized) {\n            filteredValue = newValue;\n            initialized = true;\n        } else {\n            filteredValue = alpha * newValue + (1 - alpha) * filteredValue;\n        }\n        return filteredValue;\n    }\n\nprivate:\n    float alpha;\n    float filteredValue;\n    bool initialized;\n};\n\nint main() {\n    EMAFilter ema(0.1); // 设置平滑系数 alpha = 0.1\n    float sensorData[] = {25.0, 26.5, 30.2, 29.8, 31.0, 30.5};\n    \n    for (float data : sensorData) {\n        std::cout << \"Filtered Value: \" << ema.filter(data) << std::endl;\n    }\n    \n    return 0;\n}\n"
+        }
+      ],
+      "id": "COgO8IZM",
+      "createdAt": 1727100310446,
+      "updatedAt": 1727100379156
     }
   ],
   "tags": [
@@ -419,6 +441,18 @@
       "id": "1q3yNmto",
       "createdAt": 1726740745042,
       "updatedAt": 1726740745042
+    },
+    {
+      "name": "指数移动平均滤波",
+      "id": "bVFKybKW",
+      "createdAt": 1727100326884,
+      "updatedAt": 1727100326884
+    },
+    {
+      "name": "EMA",
+      "id": "0NHs4HLy",
+      "createdAt": 1727100336059,
+      "updatedAt": 1727100336059
     }
   ]
 }
