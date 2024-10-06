@@ -122,7 +122,8 @@
       "folderId": "Yw8pt8qI",
       "tagsIds": [
         "qiJo0wF7",
-        "wiCDG8SZ"
+        "wiCDG8SZ",
+        "1Jb6lpUM"
       ],
       "description": null,
       "name": "数据库操作",
@@ -130,12 +131,12 @@
         {
           "label": "子片段 1",
           "language": "c_cpp",
-          "value": "FormatString\ts;  // 定义格式化字符串方法\nconst char*\t\tsql; //定义一个数据库查询\n_CommandPtr\t\tcmd; // 数据库查询命令\n_RecordsetPtr\trs; // 数据库查询结果指针\n\nDatabase\tdba1(\"dba.udl\"); // 使用udl文件定义数据库连接\nif (dba.IsConnected() == false) // 鲁棒性判断，防止数据库没有连接成功\n\t{\n\t\tALARM(AL_WARNING, 1003, true, \"数据库连接已断开,重新连接。。。\");\n\t\tdba.Connect(\"dba.udl\");\n\t}\n\nsql = s(\"select SLAB_ID from TRACK_MATERIAL where ZONE_CODE = 4000 and XPOS = (select min(XPOS) from TRACK_MATERIAL where ZONE_CODE = 4000)\"); //  数据库查询命令书写\ncmd = dba.CreateCommand(); // 创建一个次年度数据库查询对象\ncmd->CommandText = (_bstr_t)sql; // 给对象中的查询语句赋值\nrs = cmd->Execute(NULL, 0, adCmdText); // 执行查询,获取查询结果的指针\n\n\nwhile (!rs->adoEOF)  // 在指针没有到结尾时，逐行处理数据\n\t{\n    /*\n    数据库操作代码，包括根据数据库读取结果进行变脸赋值，更新数据库中某一条目，\n    */\n\n\t\trs->MoveNext(); // 指针指向下一条数据\n\n\t}\n\tdba1.Disconnect(); // 断开数据库连接"
+          "value": "FormatString\ts;  // 定义格式化字符串方法\nconst char*\t\tsql; //定义一个数据库查询\n_CommandPtr\t\tcmd; // 数据库查询命令\n_RecordsetPtr\trs; // 数据库查询结果指针\n\nDatabase\tdba1(\"dba.udl\"); // 使用udl文件定义数据库连接\nif (dba.IsConnected() == false) // 鲁棒性判断，防止数据库没有连接成功\n\t{\n\t\tALARM(AL_WARNING, 1003, true, \"数据库连接已断开,重新连接。。。\");\n\t\tdba.Connect(\"dba.udl\");\n\t}\n\nsql = s(\"select SLAB_ID from TRACK_MATERIAL where ZONE_CODE = 4000 and XPOS = (select min(XPOS) from TRACK_MATERIAL where ZONE_CODE = 4000)\"); //  数据库查询命令书写\ncmd = dba.CreateCommand(); // 创建一个次年度数据库查询对象\ncmd->CommandText = (_bstr_t)sql; // 给对象中的查询语句赋值\nrs = cmd->Execute(NULL, 0, adCmdText); // 执行查询,获取查询结果的指针\n\nint cnt = rs->GetRecordCount(); // 获取数据库查询得到的数据总量\n\nwhile (!rs->adoEOF)  // 在指针没有到结尾时，逐行处理数据\n\t{\n    /*\n    数据库操作代码，包括根据数据库读取结果进行变脸赋值，更新数据库中某一条目，\n    */\n\n\t\trs->MoveNext(); // 指针指向下一条数据\n\n\t}\n\tdba1.Disconnect(); // 断开数据库连接"
         }
       ],
       "id": "xJqmmXuE",
       "createdAt": 1721957199101,
-      "updatedAt": 1723959563585
+      "updatedAt": 1727493005638
     },
     {
       "isDeleted": false,
@@ -275,12 +276,12 @@
         {
           "label": "子片段 1",
           "language": "c_cpp",
-          "value": "#include <iostream>\n#include <string>\n#include <vector>\n#include <map>\n#include <curl/curl.h>\n#include <json/json.h>\n\n/**\n * @brief 回调函数，用于接收 HTTP 响应\n * @param contents 接收到的数据内容\n * @param size 每个数据块的大小\n * @param nmemb 数据块的数量\n * @param s 用于存储接收到的数据的字符串指针\n * @return 实际处理的数据大小\n */\nstatic size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* s) {\n\tsize_t newLength = size * nmemb;\n\ttry {\n\t\ts->append((char*)contents, newLength);\n\t}\n\tcatch (std::bad_alloc&) {\n\t\t// 内存分配失败时返回0\n\t\treturn 0;\n\t}\n\treturn newLength;\n}\n\n/**\n * @brief 发送 POST 请求并返回响应内容\n * @param url 请求的 URL\n * @param jsonData 请求的 JSON 数据\n * @return 服务器的响应内容\n */\nstd::string sendPostRequest(const std::string& url, const std::string& jsonData) {\n\tCURL* curl;\n\tCURLcode res;\n\tstd::string readBuffer;\n\n\tcurl_global_init(CURL_GLOBAL_DEFAULT);\n\tcurl = curl_easy_init();\n\tif (curl) {\n\t\tstruct curl_slist* headers = nullptr;\n\t\theaders = curl_slist_append(headers, \"Content-Type: application/json\");\n\n\t\tcurl_easy_setopt(curl, CURLOPT_URL, url.c_str());\n\t\tcurl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonData.c_str());\n\t\tcurl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);\n\t\tcurl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);\n\t\tcurl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);\n\n\t\tres = curl_easy_perform(curl);\n\t\tif (res != CURLE_OK) {\n\t\t\tstd::cerr << \"curl_easy_perform() failed: \" << curl_easy_strerror(res) << std::endl;\n      // 添加以下4行代码可以在出错时立刻返回空串\n      curl_easy_cleanup(curl);\n\t\t\tcurl_slist_free_all(headers);\n\t\t\tcurl_global_cleanup();\n\t\t\treturn \"\"; // 直接返回，退出函数\n\t\t}\n\n\t\tcurl_easy_cleanup(curl);\n\t\tcurl_slist_free_all(headers);\n\t}\n\tcurl_global_cleanup();\n\n\treturn readBuffer;\n}\n\n/**\n * @brief 解析 JSON 响应并提取特定内容\n * @param jsonResponse 需要解析的 JSON 字符串\n * @return 提取的 JSON 数据\n */\nJson::Value parseJsonResponse(const std::string& jsonResponse) {\n\tJson::CharReaderBuilder readerBuilder;\n\tJson::Value root;\n\tstd::string errs;\n\tstd::istringstream ss(jsonResponse);\n\n\tif (!Json::parseFromStream(readerBuilder, ss, &root, &errs)) {\n\t\tstd::cerr << \"Failed to parse JSON: \" << errs << std::endl;\n    return Json::nullValue;  // 解析失败时返回空值\n\t}\n\n\t// 提取特定路径下的数据\n\treturn root[\"__blocks__\"][\"result\"][\"rows\"];\n}\n\n/**\n * @brief 映射 JSON 记录到字段名并输出\n * @param rows 包含多条记录的 JSON 数组\n */\nvoid mapAndPrintRows(const Json::Value& rows) {\n\t// 定义字段名\n\tstd::vector<std::string> fieldNames = {\n\t\t\"FactoryPSC\", \"HeatNo\", \"JobNo\", \"JodCutPlanNo\", \"LJ1FLAG\",\n\t\t\"MatNum\", \"PlanNum\", \"RLNO\", \"SlowCoolingTime\",\n\t\t\"StartDateTime\", \"StartStayDateTime\", \"Status\",\n\t\t\"StayTime\", \"WasteNum\"\n\t};\n\n\t// 遍历每一条记录\n\tfor (const auto& row : rows) {\n\t\tstd::map<std::string, std::string> recordMap;\n\n\t\t// 将每个值映射到相应的字段名\n\t\tfor (size_t i = 0; i < row.size() && i < fieldNames.size(); ++i) {\n\t\t\trecordMap[fieldNames[i]] = row[i].asString();\n\t\t}\n\n\t\t// 输出记录\n\t\tstd::cout << \"Record:\" << std::endl;\n\t\tfor (const auto& field : fieldNames) {\n\t\t\tstd::cout << \"  \" << field << \": \" << recordMap[field] << std::endl;\n\t\t}\n\t\tstd::cout << std::endl;\n\t}\n}\n\n/**\n * @brief 主函数\n * @return 程序退出状态\n */\nint main() {\n\t// 设置 URL 和 POST 请求数据\n\tstd::string url = \"http://10.38.98.30:8080/iplat/service/S_BI_XA_0306\";\n\tstd::string jsonData = R\"({\n        \"subjectEname\": \"OperationStoreQuery\",\n        \"offset\": \"0\",\n        \"limit\": \"1000\",\n        \"dataFormat\": \"inInfo\",\n        \"paramType\": \"unify\",\n        \"queryParamUnify\": {\n            \"whole_backlog_code\": \"120\",\n            \"jod_work_center\": \"04\"\n        }\n    })\";\n\n\t// 发送 POST 请求\n\tstd::string response = sendPostRequest(url, jsonData);\n\n\t// 解析响应并提取所需内容\n\tJson::Value rows = parseJsonResponse(response);\n\n\t// 映射并输出结果\n\tmapAndPrintRows(rows);\n\n\treturn 0;\n}\n\n"
+          "value": "std::string sendPostRequest() {\n\tCURL* curl;\n\tCURLcode res;\n\tstd::string readBuffer;\n\n\tcurl_global_init(CURL_GLOBAL_DEFAULT);\n\tcurl = curl_easy_init();\n\tif (!curl) {\n\n\t\tcurl_global_cleanup();\n\t\treturn \"\";\n\n\t}\n\n\tstruct curl_slist* headers = nullptr;\n\theaders = curl_slist_append(headers, \"Content-Type: application/json; charset=utf-8\");\n\t//headers = curl_slist_append(headers, \"Accept: application/json; charset=utf-8\");\n\tif (!headers) {\n\t\tcurl_easy_cleanup(curl);\n\t\tcurl_global_cleanup();\n\t\treturn \"\";\n\t}\n\tcurl_easy_setopt(curl, CURLOPT_URL, url.c_str());\n\tcurl_easy_setopt(curl, CURLOPT_POSTFIELDS, head.c_str());\n\tcurl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);\n\tcurl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);\n\tcurl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);\n\n\tres = curl_easy_perform(curl);\n\tif (res != CURLE_OK) {\n\t\t//std::cerr << \"curl_easy_perform() failed: \" << curl_easy_strerror(res) << std::endl;\n\t\tcurl_easy_cleanup(curl);\n\t\tcurl_slist_free_all(headers);\n\t\tcurl_global_cleanup();\n\t\treturn \"\"; // 直接返回，退出函数\n\t}\n\n\tcurl_easy_cleanup(curl);\n\tcurl_slist_free_all(headers);\n\n\tcurl_global_cleanup();\n\tstd::cout << UTF8ToGB2312(readBuffer) << std::endl;\n\treturn readBuffer;\n  }\n  \n  nlohmann::json extractRows(const std::string& jsonString) {\n\ttry {\n\t\t// 解析输入的 JSON 字符串\n\t\tnlohmann::json jsonResponse = nlohmann::json::parse(jsonString);\n\n\t\t// 检查是否包含 __blocks__, result 和 rows\n\t\tif (jsonResponse.contains(\"__blocks__\") &&\n\t\t\tjsonResponse[\"__blocks__\"].contains(\"result\") &&\n\t\t\tjsonResponse[\"__blocks__\"][\"result\"].contains(\"rows\")) {\n\n\t\t\t// 提取 rows 内容\n\t\t\treturn jsonResponse[\"__blocks__\"][\"result\"][\"rows\"];\n\t\t}\n\t\telse {\n\t\t\tthrow std::runtime_error(\"JSON 中不包含指定的结构。\");\n\t\t}\n\t}\n\tcatch (const nlohmann::json::exception& e) {\n\t\tthrow std::runtime_error(std::string(\"JSON 解析错误: \") + e.what());\n\t}\n}\n\nstatic size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* s) {\n\tsize_t newLength = size * nmemb;\n\ttry {\n\t\ts->append((char*)contents, newLength);\n\t}\n\tcatch (std::bad_alloc&) {\n\t\t// 内存分配失败时返回0\n\t\treturn 0;\n\t}\n\treturn newLength;\n}"
         }
       ],
       "id": "cbhlrf2z",
       "createdAt": 1724812389483,
-      "updatedAt": 1727100230036
+      "updatedAt": 1727267007703
     },
     {
       "isDeleted": false,
@@ -343,6 +344,42 @@
       "id": "COgO8IZM",
       "createdAt": 1727100310446,
       "updatedAt": 1727100379156
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [],
+      "description": null,
+      "name": "定时器",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <thread>\n#include <chrono>\nwhile (true) {\n\t\tPostToDB();\n\t\tstd::this_thread::sleep_for(std::chrono::minutes(time)); // 每隔2分钟执行一次\n\t}"
+        }
+      ],
+      "id": "F5rEQgWA",
+      "createdAt": 1727266694006,
+      "updatedAt": 1727266729757
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [],
+      "description": null,
+      "name": "字符串切片",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "void ExtractSubstringBeforeChar(const char* input, char sym, char* res)\n{\n    // 参数检查，确保输入字符串和输出缓冲区不为空\n    if (input == nullptr || res == nullptr) {\n        return; // 如果输入无效则直接返回\n    }\n\n    // 查找符号在字符串中的位置\n    const char* position = strchr(input, sym);\n    \n    if (position != nullptr) {\n        // 计算符号之前部分的长度\n        size_t length = position - input;\n        \n        // 确保res有足够的空间, 在生产代码中最好提供一个长度参数来控制\n        strncpy(res, input, length);\n        res[length] = '\\0'; // 确保以null字符结尾\n    }\n    else {\n        // 如果没有找到符号，则复制整个字符串\n        strcpy(res, input);\n    }\n}"
+        }
+      ],
+      "id": "snDA9sDZ",
+      "createdAt": 1727493012988,
+      "updatedAt": 1727493341806
     }
   ],
   "tags": [
@@ -453,6 +490,12 @@
       "id": "0NHs4HLy",
       "createdAt": 1727100336059,
       "updatedAt": 1727100336059
+    },
+    {
+      "name": "获取返回数据量",
+      "id": "1Jb6lpUM",
+      "createdAt": 1727492973761,
+      "updatedAt": 1727492973761
     }
   ]
 }
