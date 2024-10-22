@@ -380,6 +380,48 @@
       "id": "snDA9sDZ",
       "createdAt": 1727493012988,
       "updatedAt": 1727493341806
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "a3J2dD70",
+      "tagsIds": [
+        "mFoRiI9Z"
+      ],
+      "description": null,
+      "name": "字段值是否唯一",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "sql",
+          "value": "SELECT PLAN_ID\nFROM FCE.TB_MES_OSQ\nWHERE WORK_STATUS = 'N' AND (MAT_NUM - CHARGEDNUM) > 0\nGROUP BY PLAN_ID\nHAVING COUNT(PLAN_ID) > 1;"
+        }
+      ],
+      "id": "cQVfme3q",
+      "createdAt": 1729602575017,
+      "updatedAt": 1729602635779
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "a3J2dD70",
+      "tagsIds": [
+        "FpyQ_9eV",
+        "RzQcsckp",
+        "uls7FV_M"
+      ],
+      "description": null,
+      "name": "空值赋uid",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "sql",
+          "value": "UPDATE TB_MES_OSQ\n    SET JOB_NO = RAWTOHEX(SYS_GUID())\n    WHERE JOB_NO IS NULL OR TRIM(JOB_NO) IN ('', ' ');"
+        }
+      ],
+      "id": "hCmCNR1q",
+      "createdAt": 1729602638441,
+      "updatedAt": 1729602683078
     }
   ],
   "tags": [
@@ -496,6 +538,30 @@
       "id": "1Jb6lpUM",
       "createdAt": 1727492973761,
       "updatedAt": 1727492973761
+    },
+    {
+      "name": "字段值唯一判断",
+      "id": "mFoRiI9Z",
+      "createdAt": 1729602635710,
+      "updatedAt": 1729602635710
+    },
+    {
+      "name": "uid",
+      "id": "FpyQ_9eV",
+      "createdAt": 1729602672901,
+      "updatedAt": 1729602672901
+    },
+    {
+      "name": "空值jiance",
+      "id": "RzQcsckp",
+      "createdAt": 1729602678450,
+      "updatedAt": 1729602678450
+    },
+    {
+      "name": "空值赋uid",
+      "id": "uls7FV_M",
+      "createdAt": 1729602683013,
+      "updatedAt": 1729602683013
     }
   ]
 }
