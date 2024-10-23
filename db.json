@@ -182,24 +182,6 @@
       "updatedAt": 1727100589677
     },
     {
-      "isDeleted": true,
-      "isFavorites": false,
-      "folderId": "",
-      "tagsIds": [],
-      "description": null,
-      "name": "",
-      "content": [
-        {
-          "label": "子片段 1",
-          "language": "plain_text",
-          "value": ""
-        }
-      ],
-      "id": "UpTPvDmW",
-      "createdAt": 1723962167307,
-      "updatedAt": 1723962177756
-    },
-    {
       "isDeleted": false,
       "isFavorites": false,
       "folderId": "Yw8pt8qI",
@@ -422,6 +404,71 @@
       "id": "hCmCNR1q",
       "createdAt": 1729602638441,
       "updatedAt": 1729602683078
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "a3J2dD70",
+      "tagsIds": [
+        "l9soUARk",
+        "tKcP8dhW"
+      ],
+      "description": null,
+      "name": "交换计划",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "sql",
+          "value": "CREATE OR REPLACE PROCEDURE FCEL2.EXPDI(\nV_NEWSEQ IN VARCHAR2,\nV_CARD_ID IN VARCHAR2,\nV_RLNO IN VARCHAR2\n) AS\nN_SEQ NUMBER;\nT_CARD_ID VARCHAR2(128);\nT_RLNO VARCHAR2(128);\nBEGIN\n   SAVEPOINT start_of_transaction;\n   -- 查询交换目标的轧制号，工作号\n   SELECT ROLLING_PLAN_CODE, CARD_ID INTO T_RLNO, T_CARD_ID  FROM FCEL2.V_TB_PDI WHERE SCHEDULE_SEQ=V_NEWSEQ;\n   -- 查询当前计划对应的编号\n   SELECT SCHEDULE_SEQ INTO N_SEQ FROM FCEL2.V_TB_PDI WHERE ROLLING_PLAN_CODE=V_RLNO AND CARD_ID=V_CARD_ID;\n--   SELECT SCHEDULE_SEQ INTO N_SEQ FROM FCEL2.V_TB_PDI WHERE ROLLING_PLAN_CODE=V_RLNO;\n   -- 把交换目标的序号改了\n   \n--   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=N_SEQ WHERE RLNO=T_RLNO AND JOB_NO=T_CARD_ID;\n   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=N_SEQ WHERE WORK_STATUS = 'N' AND (MAT_NUM - CHARGEDNUM) > 0 AND RLNO=T_RLNO AND JOB_NO=T_CARD_ID;\n   -- 把当前计划的序号改了\n--   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=V_NEWSEQ WHERE RLNO=V_RLNO AND JOB_NO=V_CARD_ID;\n   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=V_NEWSEQ WHERE WORK_STATUS = 'N' AND (MAT_NUM - CHARGEDNUM) > 0 AND RLNO=V_RLNO AND JOB_NO=V_CARD_ID;\n   COMMIT;  -- 添加提交操作\n   EXCEPTION\n     WHEN NO_DATA_FOUND THEN\n       NULL;\n     WHEN OTHERS THEN\n     ROLLBACK TO SAVEPOINT start_of_transaction;\n       -- Consider logging the error and then re-raise\n       RAISE;\nEND EXPDI;\n/\n"
+        }
+      ],
+      "id": "Fbt9DowM",
+      "createdAt": 1729643852533,
+      "updatedAt": 1729643875349
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "a3J2dD70",
+      "tagsIds": [
+        "unl4Q6rt",
+        "Gfqv_F--",
+        "tKcP8dhW"
+      ],
+      "description": null,
+      "name": "上移下移",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "sql",
+          "value": "CREATE OR REPLACE PROCEDURE FCEL2.UPDOWN(\nP_JOB_NO IN VARCHAR2,\nFLAG IN NUMBER\n) IS\nP_ID NUMBER;\nP_TARGET_ID NUMBER;\nP_TARGET_JOB_NO VARCHAR2(64);\nBEGIN\n   SELECT PLAN_ID INTO P_ID FROM FCE.TB_MES_OSQ WHERE JOB_NO=P_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   IF FLAG=1 THEN\n   SELECT MIN(PLAN_ID) INTO P_TARGET_ID  FROM FCE.TB_MES_OSQ WHERE PLAN_ID>P_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   END IF;\n   IF FLAG=-1 THEN\n   SELECT MAX(PLAN_ID) INTO P_TARGET_ID  FROM FCE.TB_MES_OSQ WHERE PLAN_ID<P_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   END IF;\n   SELECT JOB_NO INTO P_TARGET_JOB_NO FROM FCE.TB_MES_OSQ WHERE PLAN_ID=P_TARGET_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   \n   SAVEPOINT SP_BEFORE_UPDATES;\n   \n   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=P_TARGET_ID WHERE JOB_NO=P_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=P_ID WHERE JOB_NO=P_TARGET_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   -- 如果一切正常，提交更新\n   COMMIT;\n   \n   EXCEPTION\n     WHEN NO_DATA_FOUND THEN\n       ROLLBACK TO SP_BEFORE_UPDATES;\n     WHEN OTHERS THEN\n       ROLLBACK;\n       -- Consider logging the error and then re-raise\n       RAISE;\nEND UPDOWN;\n/\n"
+        }
+      ],
+      "id": "-FuV_nv8",
+      "createdAt": 1729643891924,
+      "updatedAt": 1729643911571
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "a3J2dD70",
+      "tagsIds": [
+        "h7D4WfdH",
+        "TBUFZU0p",
+        "JNoXREVd"
+      ],
+      "description": null,
+      "name": "刷新序号",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "sql",
+          "value": "CREATE OR REPLACE PROCEDURE FCEL2.REFRESH_ID IS\n     -- 声明游标以存储查询结果\n  CURSOR c_osq_data IS\n  SELECT PLAN_ID,\n         RLNO,\n         JOB_NO\n    FROM FCE.TB_MES_OSQ\n   WHERE WORK_STATUS = 'N' AND (MAT_NUM - CHARGEDNUM) > 0\n   ORDER BY PLAN_ID ASC\n   FOR UPDATE; \n\n\n  -- 变量声明\n  v_new_plan_id NUMBER := 1;\n  v_has_duplicates NUMBER := 0; -- 使用NUMBER类型用于存储重复记录计数\n\nBEGIN\n  -- 检查是否存在重复的PLAN_ID\n  BEGIN\n    SELECT COUNT(*)\n      INTO v_has_duplicates\n      FROM (SELECT PLAN_ID\n              FROM FCE.TB_MES_OSQ\n             WHERE WORK_STATUS = 'N' AND (MAT_NUM - CHARGEDNUM) > 0\n             GROUP BY PLAN_ID\n            HAVING COUNT(*) > 1);\n\n    IF v_has_duplicates = 0 THEN\n      RETURN;\n    END IF;\n  END;\nFOR V_PLAN IN c_osq_data\nLOOP \n    UPDATE FCE.TB_MES_OSQ SET PLAN_ID = v_new_plan_id WHERE RLNO=V_PLAN.RLNO AND JOB_NO=V_PLAN.JOB_NO;\n    v_new_plan_id := v_new_plan_id+1;\nEND LOOP; \nUPDATE FCE.TB_MES_OSQ\n    SET JOB_NO = RAWTOHEX(SYS_GUID())\n    WHERE JOB_NO IS NULL OR TRIM(JOB_NO) IN ('', ' ');\n  COMMIT;\n\nEXCEPTION\n  WHEN OTHERS THEN\n    -- 处理异常\n    ROLLBACK;\n    RAISE;\n\nEND REFRESH_ID;\n/\n"
+        }
+      ],
+      "id": "OhfVjPBc",
+      "createdAt": 1729643928480,
+      "updatedAt": 1729643994487
     }
   ],
   "tags": [
@@ -562,6 +609,48 @@
       "id": "uls7FV_M",
       "createdAt": 1729602683013,
       "updatedAt": 1729602683013
+    },
+    {
+      "name": "交换计划",
+      "id": "l9soUARk",
+      "createdAt": 1729643868789,
+      "updatedAt": 1729643868789
+    },
+    {
+      "name": "PL/SQL",
+      "id": "tKcP8dhW",
+      "createdAt": 1729643875281,
+      "updatedAt": 1729643875281
+    },
+    {
+      "name": "上移",
+      "id": "unl4Q6rt",
+      "createdAt": 1729643905291,
+      "updatedAt": 1729643905291
+    },
+    {
+      "name": "下移",
+      "id": "Gfqv_F--",
+      "createdAt": 1729643907043,
+      "updatedAt": 1729643907043
+    },
+    {
+      "name": "刷新序号",
+      "id": "h7D4WfdH",
+      "createdAt": 1729643960056,
+      "updatedAt": 1729643960056
+    },
+    {
+      "name": "字段唯一检测",
+      "id": "TBUFZU0p",
+      "createdAt": 1729643980089,
+      "updatedAt": 1729643980089
+    },
+    {
+      "name": "序号重排",
+      "id": "JNoXREVd",
+      "createdAt": 1729643994417,
+      "updatedAt": 1729643994417
     }
   ]
 }
