@@ -441,12 +441,12 @@
         {
           "label": "子片段 1",
           "language": "sql",
-          "value": "CREATE OR REPLACE PROCEDURE FCEL2.UPDOWN(\nP_JOB_NO IN VARCHAR2,\nFLAG IN NUMBER\n) IS\nP_ID NUMBER;\nP_TARGET_ID NUMBER;\nP_TARGET_JOB_NO VARCHAR2(64);\nBEGIN\n   SELECT PLAN_ID INTO P_ID FROM FCE.TB_MES_OSQ WHERE JOB_NO=P_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   IF FLAG=1 THEN\n   SELECT MIN(PLAN_ID) INTO P_TARGET_ID  FROM FCE.TB_MES_OSQ WHERE PLAN_ID>P_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   END IF;\n   IF FLAG=-1 THEN\n   SELECT MAX(PLAN_ID) INTO P_TARGET_ID  FROM FCE.TB_MES_OSQ WHERE PLAN_ID<P_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   END IF;\n   SELECT JOB_NO INTO P_TARGET_JOB_NO FROM FCE.TB_MES_OSQ WHERE PLAN_ID=P_TARGET_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   \n   SAVEPOINT SP_BEFORE_UPDATES;\n   \n   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=P_TARGET_ID WHERE JOB_NO=P_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   UPDATE FCE.TB_MES_OSQ SET PLAN_ID=P_ID WHERE JOB_NO=P_TARGET_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n   -- 如果一切正常，提交更新\n   COMMIT;\n   \n   EXCEPTION\n     WHEN NO_DATA_FOUND THEN\n       ROLLBACK TO SP_BEFORE_UPDATES;\n     WHEN OTHERS THEN\n       ROLLBACK;\n       -- Consider logging the error and then re-raise\n       RAISE;\nEND UPDOWN;\n/\n"
+          "value": "CREATE OR REPLACE PROCEDURE FCE.UpDown(\n    P_JOB_NO IN VARCHAR2,\n    FLAG IN NUMBER\n) IS\n    P_ID NUMBER;\n    P_TARGET_ID NUMBER;\n    P_TARGET_JOB_NO VARCHAR2(64);\nBEGIN\n    BEGIN\n        SELECT PLAN_ID INTO P_ID \n        FROM TB_MES_OSQ \n        WHERE JOB_NO = P_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n    EXCEPTION\n        WHEN NO_DATA_FOUND THEN\n            DBMS_OUTPUT.PUT_LINE('No matching PLAN_ID found for given JOB_NO.');\n            RETURN;\n    END;\n    \n    IF FLAG = 1 THEN\n        SELECT MIN(PLAN_ID) INTO P_TARGET_ID  \n        FROM TB_MES_OSQ \n        WHERE PLAN_ID > P_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n    ELSIF FLAG = -1 THEN\n        SELECT MAX(PLAN_ID) INTO P_TARGET_ID  \n        FROM TB_MES_OSQ \n        WHERE PLAN_ID < P_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n    ELSE\n        DBMS_OUTPUT.PUT_LINE('Invalid FLAG value.');\n        RETURN;\n    END IF;\n    \n    IF P_TARGET_ID IS NULL THEN\n        DBMS_OUTPUT.PUT_LINE('No target PLAN_ID found for the specified FLAG direction.');\n        RETURN;\n    END IF;\n\n    BEGIN\n        SELECT JOB_NO INTO P_TARGET_JOB_NO \n        FROM TB_MES_OSQ \n        WHERE PLAN_ID = P_TARGET_ID AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n    EXCEPTION\n        WHEN NO_DATA_FOUND THEN\n            DBMS_OUTPUT.PUT_LINE('No JOB_NO found for the target PLAN_ID.');\n            RETURN;\n    END;\n\n    SAVEPOINT SP_BEFORE_UPDATES;\n    \n    UPDATE TB_MES_OSQ \n    SET PLAN_ID = P_TARGET_ID \n    WHERE JOB_NO = P_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n\n    IF SQL%ROWCOUNT = 0 THEN\n        ROLLBACK TO SP_BEFORE_UPDATES;\n        DBMS_OUTPUT.PUT_LINE('No rows updated for original JOB_NO.');\n        RETURN;\n    END IF;\n\n    UPDATE TB_MES_OSQ \n    SET PLAN_ID = P_ID \n    WHERE JOB_NO = P_TARGET_JOB_NO AND MAT_NUM - CHARGEDNUM > 0 AND work_STATUS = 'N';\n\n    IF SQL%ROWCOUNT = 0 THEN\n        ROLLBACK TO SP_BEFORE_UPDATES;\n        DBMS_OUTPUT.PUT_LINE('No rows updated for target JOB_NO.');\n        RETURN;\n    END IF;\n\n    COMMIT;\nEXCEPTION\n    WHEN OTHERS THEN\n        ROLLBACK;\n        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);\n        RAISE;\nEND UpDown;\n/\n"
         }
       ],
       "id": "-FuV_nv8",
       "createdAt": 1729643891924,
-      "updatedAt": 1729643911571
+      "updatedAt": 1730085455079
     },
     {
       "isDeleted": false,
@@ -469,6 +469,69 @@
       "id": "OhfVjPBc",
       "createdAt": 1729643928480,
       "updatedAt": 1729643994487
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "VIyR4X19",
+        "oygN_nu5",
+        "9n38nhki"
+      ],
+      "description": null,
+      "name": "计算时间差",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <iostream>\n#include <sstream>\n#include <iomanip>\n#include <chrono>\n\nint diffInMinutes(const std::string& dt1, const std::string& dt2) {\n\tstd::tm tm1 = {}, tm2 = {};\n\n\tstd::istringstream ss1(dt1);\n\tstd::istringstream ss2(dt2);\n\n\t// 设置期望的输入格式\n\tss1 >> std::get_time(&tm1, \"%Y/%m/%d %H:%M:%S\");\n\tss2 >> std::get_time(&tm2, \"%Y/%m/%d %H:%M:%S\");\n\n\tif (ss1.fail() || ss2.fail()) {\n\t\tstd::cerr << \"Failed to parse date and time.\" << std::endl;\n\t\treturn 0;  // 返回0表示解析失败\n\t}\n\n\t// 将tm结构转换为time_point\n\tauto tp1 = std::chrono::system_clock::from_time_t(std::mktime(&tm1));\n\tauto tp2 = std::chrono::system_clock::from_time_t(std::mktime(&tm2));\n\n\t// 计算时间差并转换为分钟\n\tauto duration = std::chrono::duration_cast<std::chrono::minutes>(tp2 - tp1);\n\treturn duration.count();\n}"
+        }
+      ],
+      "id": "CjqKgRAa",
+      "createdAt": 1730339911771,
+      "updatedAt": 1730340092298
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "DUqKYFET"
+      ],
+      "description": null,
+      "name": "保留小数位数",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <iostream>\n#include <iomanip>  // 包含 iomanip 库\n\nint main() {\n    float NewTC = 37.456;  // 假设这是你的原始温度值\n    float temp_avg = NewTC;\n\n    // 设置输出格式为固定小数点表示法，并保留1位小数\n    std::cout << std::fixed << std::setprecision(1);\n\n    // 输出温度平均值\n    std::cout << \"Temperature Average: \" << temp_avg << \"°C\" << std::endl;\n\n    return 0;\n}"
+        }
+      ],
+      "id": "Ks4rGB_6",
+      "createdAt": 1730344213137,
+      "updatedAt": 1730344231153
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "U3Hc3PzY",
+        "DxiRA4Ci"
+      ],
+      "description": null,
+      "name": "四舍五入",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "#include <cmath>  // 包含 cmath 库\n\n// 四舍五入到1位小数\ntemp_avg = std::round(temp_avg * 10) / 10;"
+        }
+      ],
+      "id": "acsjnQ8V",
+      "createdAt": 1730344451996,
+      "updatedAt": 1730344475288
     }
   ],
   "tags": [
@@ -651,6 +714,42 @@
       "id": "JNoXREVd",
       "createdAt": 1729643994417,
       "updatedAt": 1729643994417
+    },
+    {
+      "name": "时间差",
+      "id": "VIyR4X19",
+      "createdAt": 1730339931181,
+      "updatedAt": 1730339931181
+    },
+    {
+      "name": "数据库时间",
+      "id": "oygN_nu5",
+      "createdAt": 1730339934070,
+      "updatedAt": 1730339934070
+    },
+    {
+      "name": "C++sysdate",
+      "id": "9n38nhki",
+      "createdAt": 1730339939742,
+      "updatedAt": 1730339939742
+    },
+    {
+      "name": "浮点数精确度",
+      "id": "DUqKYFET",
+      "createdAt": 1730344231085,
+      "updatedAt": 1730344231085
+    },
+    {
+      "name": "四舍五入",
+      "id": "U3Hc3PzY",
+      "createdAt": 1730344465784,
+      "updatedAt": 1730344465784
+    },
+    {
+      "name": "保留1位小数",
+      "id": "DxiRA4Ci",
+      "createdAt": 1730344475225,
+      "updatedAt": 1730344475225
     }
   ]
 }
