@@ -152,12 +152,12 @@
         {
           "label": "子片段 1",
           "language": "c_cpp",
-          "value": "dba.BeginTrans(\"dba.udl\"); // 连接数据库创建事务\nsql = s(\"insert into TB_PRODUCT_HIS select * from TB_PRODUCT where DISCHARGE_TIME<sysdate-90\");  // 事务语句\ncmd = dba.CreateCommand(); \ncmd->CommandText = (_bstr_t)sql;\ncmd->Execute(NULL, 0, adCmdText); // 执行查询\ndba.CommitTrans(\"dba.udl\"); 、// 事务提交\n// dba.RollbackTrans; 事务回滚"
+          "value": "dba.BeginTrans(\"dba.udl\"); // 连接数据库创建事务\nsql = s(\"insert into TB_PRODUCT_HIS select * from TB_PRODUCT where DISCHARGE_TIME<sysdate-90\");  // 事务语句\ncmd = dba.CreateCommand(); \ncmd->CommandText = (_bstr_t)sql;\ncmd->Execute(NULL, 0, adCmdText); // 执行查询\ndba.CommitTrans(\"dba.udl\"); // 事务提交\n// dba.RollbackTrans; 事务回滚"
         }
       ],
       "id": "Tue5u7oh",
       "createdAt": 1721959080848,
-      "updatedAt": 1723959574026
+      "updatedAt": 1734755752928
     },
     {
       "isDeleted": false,
@@ -532,6 +532,44 @@
       "id": "acsjnQ8V",
       "createdAt": 1730344451996,
       "updatedAt": 1730344475288
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [
+        "xIYJ5h0p"
+      ],
+      "description": null,
+      "name": "字符串分割",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "/**\n * @brief 将输入字符串按照指定的分隔符分割，并映射到预定义的键值对中。\n *\n * 此函数接收一个包含多个字段的字符串，使用 '+' 作为分隔符将字符串分割成多个部分，\n * 然后将这些部分与预定义的键关联起来，形成一个 `std::map`。\n *\n * @param input 输入字符串，包含多个字段，字段之间用 '+' 分隔。\n * @return std::map<std::string, std::string> 包含键值对的映射，其中键是预定义的字段名。\n */\nstd::map<std::string, std::string> splitAndMap(const std::string& input) {\n\tconst std::string keys[] = { \"time\", \"rflag\", \"inid1\", \"inid2\", \"inid3\", \"outid1\", \"outid2\", \"outid3\", \"fceno\", \"jobno\", \"fsc\", \"weight\" };\n\tstd::map<std::string, std::string> result;\n\tstd::istringstream iss(input);\n\tstd::string part;\n\n\t// 遍历字符串并将其分割为各个部分\n\tfor (int i = 0; i < 12 && std::getline(iss, part, '+'); ++i) {\n\t\t// 将分割出来的部分与对应的键关联起来\n\t\tresult[keys[i]] = part;\n\t}\n\n\treturn result;\n}"
+        }
+      ],
+      "id": "D5rlmUtF",
+      "createdAt": 1732092727517,
+      "updatedAt": 1732093647176
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [],
+      "description": null,
+      "name": "宝信电文应答",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "/**\n * @brief 回复电信号函数\n *\n * 该函数用于根据接收到的ID、功能码和标志位生成并发送回复信号。\n *\n * @param sRcvId 接收者ID\n * @param sFunctionCode 功能码\n * @param VFLAG 标志位\n * @param sender 发送方标识\n * @param receiver 接收方标识\n * @param messageType 消息通道，对应于PCDP中的设置\n */\nvoid ReplyTel(const char* sRcvId, const char* sFunctionCode, const char* VFLAG, const char* sender, const char* receiver, const char* messageChannel)\n{\n\tif (!sRcvId || !sFunctionCode || !VFLAG || !sender || !receiver || !messageChannel) {\n\t\tALARM(AL_ERROR, 1003, true, \"Invalid input parameters in ReplyTel\");\n\t\treturn;\n\t}\n\n\tTimeStamp TNow; // 当前时间戳对象\n\tchar ControlZone[81]; // 控制区域字符数组，最大长度为80加结束符\n\tFormatString s; // 字符串格式化对象\n\tchar sTemp[64]; // 临时字符串缓冲区\n\tint retc; // 返回值\n\n\tTRY_BLOCK_BEGIN(); // 开始异常处理块\n\n\tTel_ReplyMes ReplyMes; // 定义回复消息结构体变量\n\tmemset(&ReplyMes, 0x00, sizeof(ReplyMes)); // 初始化回复消息结构体为空\n\tTNow.Now(); // 获取当前时间\n\n\tALARM(AL_INFO, 1002, false, \"MES --> ReplyTel\"); // 记录日志信息\n\n\tmemset(sTemp, 0x00, sizeof(sTemp)); // 清空临时字符串缓冲区\n\tCSPLITSTR::AddLeftZeroStr(118, NULL, 4, sTemp); // 在sTemp左侧填充零至指定长度\n\tsprintf(ReplyMes.Len, \"%s\", sTemp); // 将填充后的字符串赋值给ReplyMes的Len字段\n\n\tmemset(sTemp, 0x00, sizeof(sTemp)); // 再次清空临时字符串缓冲区\n\tsprintf(sTemp, \"%s\", sRcvId); // 将接收者ID复制到sTemp中\n\tCSPLITSTR::PadRightBlank(6, sTemp); // 在sTemp右侧填充空格至指定长度\n\tsprintf(ReplyMes.ID, \"%s\", sTemp); // 将填充后的字符串赋值给ReplyMes的ID字段\n\n\tsprintf(ReplyMes.SendDate, \"%s\", s(\"%d%02d%02d\", TNow.Year(), TNow.Month(), TNow.Day())); // 设置发送日期\n\tsprintf(ReplyMes.SendTime, \"%s\", s(\"%02d%02d%02d\", TNow.Hour(), TNow.Minute(), TNow.Second())); // 设置发送时间\n\tsprintf(ReplyMes.Sender, \"%s\", sender); // 设置发送方标识\n\tsprintf(ReplyMes.Receiver, \"%s\", receiver); // 设置接收方标识\n\tsprintf(ReplyMes.FunctionCode, \"%s\", sFunctionCode); // 设置功能码\n\n\tsprintf(ReplyMes.Flags, \"%s\", VFLAG); // 设置标志位\n\n\tmemset(ControlZone, 0x00, sizeof(ControlZone)); // 清空控制区域字符数组\n\tif (!strcmp(ReplyMes.FunctionCode, \"A\")) // 判断功能码是否为\"A\"\n\t{\n\t\tstrcpy(ControlZone, \" \"); // 将单个空格写入ControlZone\n\t}\n\telse\n\t{\n\t\tstrcpy(ControlZone, \" \"); // 将单个空格写入ControlZone\n\t}\n\tCSPLITSTR::PadRightBlank(80, ControlZone); // 在ControlZone右侧填充空格至指定长度\n\tsprintf(ReplyMes.ControlZone, \"%s\", ControlZone); // 将填充后的字符串赋值给ReplyMes的ControlZone字段\n\n\tReplyMes.Ext = 10; // 设置扩展字段为10\n\n\tretc = SendData(messageChannel, &ReplyMes, sizeof(ReplyMes)); // 发送数据，并获取返回值\n\n\tif (retc > 0) // 检查返回值是否大于0\n\t{\n\t\tALARM(AL_INFO, 1002, true, s(\"向MES发送应答电文:接收电文号=%s,代码=%s\", sRcvId, sFunctionCode)); // 记录成功发送的日志信息\n\t}\n\n\tTRY_BLOCK_SHOW_END(\"应答电文处理->ReplyTel失败\"); // 结束异常处理块，并显示错误信息（如果发生）\n}\n"
+        }
+      ],
+      "id": "Ugp1D6qZ",
+      "createdAt": 1732093652377,
+      "updatedAt": 1732093660878
     }
   ],
   "tags": [
@@ -750,6 +788,12 @@
       "id": "DxiRA4Ci",
       "createdAt": 1730344475225,
       "updatedAt": 1730344475225
+    },
+    {
+      "name": "字符串分割",
+      "id": "xIYJ5h0p",
+      "createdAt": 1732092749615,
+      "updatedAt": 1732092749615
     }
   ]
 }
