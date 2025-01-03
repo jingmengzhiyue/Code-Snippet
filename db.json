@@ -570,6 +570,24 @@
       "id": "Ugp1D6qZ",
       "createdAt": 1732093652377,
       "updatedAt": 1732093660878
+    },
+    {
+      "isDeleted": false,
+      "isFavorites": false,
+      "folderId": "Yw8pt8qI",
+      "tagsIds": [],
+      "description": null,
+      "name": "获取SQL查询字段值",
+      "content": [
+        {
+          "label": "子片段 1",
+          "language": "c_cpp",
+          "value": "//头文件引入\ntemplate<typename T>\nT GetFieldValueOrDefault(const _RecordsetPtr& rs, const char* fieldName, T defaultValue);\n\n// 声明字符串处理函数\nstd::string GetStringFieldOrDefault(const _RecordsetPtr& rs, const char* fieldName, const char* defaultValue);\n\n\ntemplate<typename T>\nT GetFieldValueOrDefault(const _RecordsetPtr& rs, const char* fieldName, T defaultValue) {\n    try {\n        _variant_t value = rs->GetCollect(fieldName);\n        if (value.vt == VT_NULL || value.vt == VT_EMPTY) {\n            return defaultValue;\n        }\n        return (T)value;\n    }\n    catch (...) {\n        return defaultValue;\n    }\n}\n\n// 针对字符串的特殊处理\nstd::string GetStringFieldOrDefault(const _RecordsetPtr& rs, const char* fieldName, const char* defaultValue) {\n    try {\n        _variant_t value = rs->GetCollect(fieldName);\n        if (value.vt == VT_NULL || value.vt == VT_EMPTY) {\n            return defaultValue;\n        }\n        return (const char*)(_bstr_t)value;\n    }\n    catch (...) {\n        return defaultValue;\n    }\n}\n\n// 调用方式\nwhile (!rs->adoEOF)\n{\n    // 字符串字段\n    strcpy(CARD_ID, GetStringFieldOrDefault(rs, \"JOB_NO\", \"\").c_str());\n    strcpy(ROLLING_PLAN_CODE, GetStringFieldOrDefault(rs, \"RLNO\", \"\").c_str());\n    strcpy(CAST_NO, GetStringFieldOrDefault(rs, \"HEAT_NO\", \"\").c_str());\n    strcpy(SLAB_ID, GetStringFieldOrDefault(rs, \"JOB_NO\", \"\").c_str());\n    strcpy(STEEL_GRADE, GetStringFieldOrDefault(rs, \"MATERIALTEXT\", \"\").c_str());\n\n    // 数值字段\n    SLAB_LEN = GetFieldValueOrDefault(rs, \"D\", 867);\n    SLAB_WGT = GetFieldValueOrDefault(rs, \"MATERIALACTUALUNITWEIGHT\", 421);\n    COIL_THK = GetFieldValueOrDefault(rs, \"S1\", 32);\n    NO1UPPERLIMIT = GetFieldValueOrDefault(rs, \"NO1UPPERLIMIT\", 0);\n    // ... 其他字段类似处理\n\n    break;\n}"
+        }
+      ],
+      "id": "krwUAFgY",
+      "createdAt": 1735896124524,
+      "updatedAt": 1735896227127
     }
   ],
   "tags": [
